@@ -1,0 +1,10 @@
+
+body{font-size: 14px;color: #333;line-height: 16px;}
+div,h,span,p{margin: 0; padding: 0; display: block; }
+p{color: #fff;}
+.gameboard{background: #333; display: block; position: relative;}
+.userinput{padding: 5px 0; font-size: 12px; position: relative;}
+.userinput input{width:180px; height: 30px; margin: 0 10px 0 0;}
+.userinput span{display: inline-block; margin: 0 5px;}
+.cbtn{float: right; margin: 5px;}
+.newstart{padding:10% 10%; position: absolute; top: 28%; left: 30%; background: #666; color: #fff; cursor: pointer;}

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>wordgame</title>
+	<link rel="stylesheet" href="wordgame.css">
+</head>
+<body>
+
+
+<div id="container"></div>
+
+<script src="jquery-1.11.0.min.js"></script>
+<script src="wordgame.js"></script>
+<script>
+
+//init game
+var game = new GameMaster();
+game.level = 3;
+game.init(game,$("#container"));
+
+</script>
+</body>
+</html>
