@@ -5,8 +5,6 @@
  * =========================
  * Parameters
  * this.letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
- * this._begin = false;
- * this._pause = false;
  * this.level = 1;
  * this.width = 500;
  * this.height = 400;
@@ -41,7 +39,6 @@ function Word(content,speedlevel,boardwidth,boardheight){
 			_self._el.trigger("loseword", _self);
 			_self._el.remove();
 			
-			//clearInterval(Timer.word);
 		}
 	}
 	this._el.on("wordinput",function(e,data){
@@ -79,112 +76,105 @@ Word.prototype = function(){
  */
 function GameMaster() {
 	//GameMaster parameters
-	this.patten = 1;
+	//this.patten = 1;
 	this.letters = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"];
-	this._begin = false;
-	this._pause = false;
 	this.level = 1;
 	this.width = 500;
 	this.height = 400;
-	this.wordbundle = [];
-	this.gameboard = $('<div class="gameboard"></div>');
-	this.useinput = $('<div class="userinput"><span>输入框:</span><input id="wordinput" type="text"/><span>剩余生命:</span><span id="lifenum">10</span><button id="rebtn" class="cbtn">refresh</button><button id="prbtn" class="cbtn">pause</button>');
-	this.newstart = $('<div class="newstart">Start A New Game</div>');
+	
 }
 //GameMaster functions
 GameMaster.prototype = function(){
-	var _self = this;
+	var _self = this,_begin = false,_pause = false,_wordbundle = [],
+		_gameboard = $('<div class="gameboard"></div>'),
+		_useinput = $('<div class="userinput"><span>输入框:</span><input id="wordinput" type="text"/><span>剩余生命:</span><span id="lifenum">10</span><button id="rebtn" class="cbtn">refresh</button><button id="prbtn" class="cbtn">pause</button>'),
+		_newstart = $('<div class="newstart">Start A New Game</div>'),
+		_playerinput,_rebtn,_lifenum,_prbtn,_wordcreate;
 	
-	init = function(domain,target){
+	init = function(target){
+		var _self =this;
 		this.wrap = target||$(document.body);
-		this.wrap.append(this.gameboard.css({
+		this.wrap.append(_gameboard.css({
 			width:this.width,
 			height:this.height,
 		}));
-		this.wrap.append(this.useinput.css({
+		this.wrap.append(_useinput.css({
 			width:this.width
 		}));
-		this.gameboard.append(this.newstart);
-		this.playerinput = $('#wordinput');
-		this.lifenum = $('#lifenum');
-		this.rebtn = $('#rebtn');
-		this.prbtn = $('#prbtn').attr("disabled",true);
-		this.rebtn = $('#rebtn').attr("disabled",true);
-		this.newstart.on("click",function(e){
-			domain.start(domain);
+		_gameboard.append(_newstart);
+		
+		_lifenum = $('#lifenum');
+		_playerinput = $('#wordinput');
+		_prbtn = $('#prbtn').attr("disabled",true);
+		_rebtn = $('#rebtn').attr("disabled",true);
+		_newstart.on("click",function(e){
+			start(_self);
 		})
 
 		$(window).keyup(function(e){
-			domain.checkrword(domain.playerinput.val())
+			checkrword(_playerinput.val())
 		})
 
 	}
 	restore = function(){
-		for(var  m = 0 ; m<this.wordbundle.length; m++){
-			this.wordbundle[m]._el.remove();
+		for(var  m = 0 ; m<_wordbundle.length; m++){
+			_wordbundle[m]._el.remove();
 		}
-		this.newstart.show();
+		_newstart.show();
 		
-		this.prbtn.attr("disabled",true).html("pause").off("click");
-		this.rebtn.attr("disabled",true).off("click");
-		this._begin = false;
-		this._pause = false;
-		clearInterval(this.wordcreate);
+		_prbtn.attr("disabled",true).html("pause").off("click");
+		_rebtn.attr("disabled",true).off("click");
+		_begin = false;
+		_pause = false;
+		clearInterval(_wordcreate);
 		
 	}
 	start = function (domain){
-		this.newstart.hide()
-		this._begin = true;
-		this._pause = false;
-		this.playerinput.focus();
-		this.lifenum = $('#lifenum').html(10);
-		this.rebtn.attr("disabled",false).on("click",function(e){
-			if(domain)domain.restore();
+		_newstart.hide();
+		_begin = true;
+		_pause = false;
+		_playerinput.focus();
+		_lifenum.html(10);
+		
+		_rebtn.attr("disabled",false).on("click",function(e){
+			restore();
 		});
-		this.prbtn.attr("disabled",false).on("click",function(e){
-			$(this).html((domain._pause==false)?"resume":"pause");
-			if(domain._pause==true){domain.resume();domain._pause = false;}
-			else{domain.pause();domain._pause = true;}
+		_prbtn.attr("disabled",false).on("click",function(e){
+			$(this).html((_pause==false)?"resume":"pause");
+			if(_pause==true){domain.resume();_pause = false;}
+			else{domain.pause();_pause = true;}
 		});
 		
 		
-		this.wordcreate = setInterval(produceword,1000/this.level*2,this);
-
+		_wordcreate = setInterval(produceword,1000/domain.level*2,domain);
 	}
 
 	pause = function (){
-		//this._pause = false;
-		clearInterval(this.wordcreate);
-		for(var  m = 0 ; m<this.wordbundle.length; m++){
-			this.wordbundle[m].pause();
+		clearInterval(_wordcreate);
+		for(var  m = 0 ; m<_wordbundle.length; m++){
+			_wordbundle[m].pause();
 		}
 		
 	}
 	resume = function (){
-		this.wordcreate = setInterval(produceword,1000/this.level*2,this);
-		for(var  m = 0 ; m<this.wordbundle.length; m++){
-			this.wordbundle[m].resume();
+		_wordcreate = setInterval(produceword,1000/this.level*2,this);
+		for(var  m = 0 ; m<_wordbundle.length; m++){
+			_wordbundle[m].resume();
 		}
 	}
 	produceword = function (domain) {
-		//var r = parseInt(Math.random()*10);
-		//if(r<5){}
-		//parseInt(Math.random()*26)
 		var _letter=domain.letters[parseInt(Math.random()*domain.letters.length)];
-		/*for(var x=0; x<domain.patten; x++){
-			_letter += domain.letters[parseInt(Math.random()*26)]
-		}*/
 		
 		var word = new Word(_letter,domain.level,domain.width,domain.height);
-		domain.gameboard.append(word._el);
-		domain.wordbundle.push(word);
+		_gameboard.append(word._el);
+		_wordbundle.push(word);
 		word._el.on("winword",function(e,data){
-			domain.playerinput.val("");
+			_playerinput.val("");
 		});
 		word._el.on("loseword",function(e,data){
-			var _val = (parseInt(domain.lifenum.html())-1);
-			domain.lifenum.html(_val);
-			if(parseInt(domain.lifenum.html())==0){
+			var _val = (parseInt(_lifenum.html())-1);
+			_lifenum.html(_val);
+			if(parseInt(_lifenum.html())==0){
 				domain.restore();
 			}
 			
@@ -192,8 +182,8 @@ GameMaster.prototype = function(){
 	
 	}
 	function checkrword(data){
-		for(var  m = 0 ; m<this.wordbundle.length; m++){
-			this.wordbundle[m]._el.trigger("wordinput",data);
+		for(var  m = 0 ; m<_wordbundle.length; m++){
+			_wordbundle[m]._el.trigger("wordinput",data);
 		}
 	}
 
